@@ -1,0 +1,8 @@
+{
+  "references": {
+    "examples": {
+      "path": "../history-adaptor",
+      "description": "Examples repository used alongside the main library"
+    }
+  }
+}

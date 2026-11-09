@@ -1,32 +1,14 @@
 # history-adaptor-example
 
-Interactive examples for [`history-adaptor`](../history-adaptor). Each example shows a **host**
-app that owns the real browser URL and an **embedded** app that keeps its routes in memory,
-connected by the adaptor.
+Interactive examples for [`history-adaptor`](https://github.com/hanzhixing/history-adaptor).
 
-This is a separate project from the library. It depends on the sibling package via
-`"history-adaptor": "file:../history-adaptor"`.
+## Examples
 
-## Setup
+| Example | Outer app (owns the URL) | Nested app (memory router) |
+| --- | --- | --- |
+| `vanilla-react` | Vanilla: ES modules, `<template>`, custom element | React |
+| `react-vue` | React SPA: React Router | Vue |
+| `solid-react` | Solid SPA: Solid Router | React |
+| `vue-angular` | Vue SPA: Vue Router | Angular (custom memory `LocationStrategy`) |
+| `angular-solid` | Angular SPA: Angular Router | Solid |
 
-The library must be built first (the example consumes `../history-adaptor/dist`):
-
-```bash
-cd ../history-adaptor
-pnpm install
-pnpm build
-```
-
-Then, in this directory:
-
-```bash
-pnpm install
-pnpm dev        # Vite dev server at http://localhost:5173
-```
-
-## Scripts
-
-- `pnpm dev` — Vite dev server
-- `pnpm build` — production build
-- `pnpm typecheck` — `tsc --noEmit`
-- `pnpm test` — Vitest (jsdom) smoke test of every example

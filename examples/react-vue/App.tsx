@@ -1,58 +1,41 @@
+import {RouterProvider, type DataRouter} from 'react-router';
+import {createApp as createVueApp} from 'vue';
 import {useEffect, useRef} from 'react';
+import type {Router as VueRouter} from 'vue-router';
 
-import {createVueEmbedded} from '../../apps/vueEmbedded.ts';
-import {PageNav} from '../../components/PageNav.tsx';
-import {RouterInput} from '../../components/RouterInput.tsx';
-import {useAddress} from '../../components/useAddress.ts';
-import {useBuilt} from '../../components/useBuilt.ts';
-import type {ExampleProps} from '../../types.ts';
-import {createBridge} from './bridge.ts';
-import {embeddedLinks, hostLinks} from './routes.tsx';
+import NestedVueApp from './NestedVueApp.vue';
 
-export const ReactVueExample = ({createHost}: ExampleProps) => {
-    const app = useBuilt(() => {
-        const host = createHost();
-        const bridge = createBridge(host.history);
-        return {
-            ...bridge,
-            hostApp: host,
-            dispose: () => {
-                bridge.dispose();
-                host.dispose?.();
-            },
-        };
-    });
-    const hostAddress = useAddress(app.host);
-    const embeddedSlot = useRef<HTMLDivElement>(null);
+/** The outer React SPA; it renders the host router and hosts the nested Vue app. */
+export const App = ({
+    hostRouter,
+    nestedRouter,
+}: {
+    hostRouter: DataRouter;
+    nestedRouter: VueRouter;
+}) => {
+    const slot = useRef<HTMLDivElement>(null);
 
-    // The host is React; the embedded app is a real Vue app mounted into its slot.
     useEffect(() => {
-        const slot = embeddedSlot.current;
-        if (!slot) {
+        const element = slot.current;
+        if (!element) {
             return;
         }
-        const embedded = createVueEmbedded({
-            slot,
-            router: app.embeddedRouter,
-            history: app.embedded,
-            links: embeddedLinks,
-        });
-        return () => embedded.dispose();
-    }, [app]);
+        const app = createVueApp(NestedVueApp);
+        app.use(nestedRouter);
+        app.mount(element);
+        return () => app.unmount();
+    }, [nestedRouter]);
 
     return (
-        <div className="space-y-4" data-host>
-            {/* Host app: React SPA, owns the real browser URL. */}
-            <PageNav history={app.host} links={hostLinks} />
-            {app.hostApp.view}
-            <RouterInput value={hostAddress} onNavigate={(next) => app.host.push(next)} />
+        <div data-host className="space-y-4">
+            <RouterProvider router={hostRouter} />
 
-            {/* Embedded app: a real Vue memory-router app mounted in the host. */}
-            <div
-                ref={embeddedSlot}
-                data-embedded
-                className="space-y-4 rounded-xl border-2 border-dashed border-slate-300 p-4"
-            />
+            <section className="space-y-3 rounded-xl border-2 border-dashed border-violet-400 p-4">
+                <p className="text-xs font-semibold uppercase tracking-widest text-violet-600">
+                    Nested Vue app (memory router)
+                </p>
+                <div id="vue-root" ref={slot} />
+            </section>
         </div>
     );
 };

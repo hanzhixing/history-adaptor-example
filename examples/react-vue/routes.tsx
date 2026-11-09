@@ -1,64 +1,18 @@
-import {buildPath} from '../../components/address.ts';
-import {ReactPage} from '../../components/ReactPage.tsx';
-import {VuePage} from '../../components/vue.tsx';
+import {createRoutesFromElements, Route} from 'react-router';
 
-// The host is a React SPA, so it owns the browser URL through React Router.
-export const hostPaths = {
-    home: '/home',
-    news: '/news',
-    post: '/post/:id',
-    blog: '/blog',
-    search: '/search',
-    docs: '/docs',
-};
+import {Content} from './Content.tsx';
+import {Layout} from './Layout.tsx';
+import type {BrowserMode} from '../../src/types.ts';
 
-export const hostHome = hostPaths.home;
-
-// The embedded app is a Vue Router memory router.
-export const embeddedPaths = {
-    home: '/vue',
-    news: '/vue/news',
-    post: '/vue/post/:id',
-    blog: '/vue/post/:post/comment/:comment',
-    search: '/vue/search',
-    docs: '/vue/docs',
-};
-
-export const hostLinks = [
-    {label: 'Home', to: hostPaths.home},
-    {label: 'News', to: hostPaths.news},
-    {label: 'Post #11', to: hostPaths.post.replace(':id', '11')},
-    {label: 'Post 123 + comment 456', to: `${hostPaths.blog}?post=123&comment=456`},
-    {label: 'Search q=router', to: `${hostPaths.search}?q=router`},
-    {label: 'Docs #intro', to: `${hostPaths.docs}#intro`},
-];
-
-export const embeddedLinks = [
-    {label: 'Home', to: embeddedPaths.home},
-    {label: 'News', to: embeddedPaths.news},
-    {label: 'Post #11', to: embeddedPaths.post.replace(':id', '11')},
-    {
-        label: 'Post 123 + comment 456',
-        to: buildPath(embeddedPaths.blog, {post: '123', comment: '456'}),
-    },
-    {label: 'Search q=router', to: `${embeddedPaths.search}?q=router`},
-    {label: 'Docs #intro', to: `${embeddedPaths.docs}#intro`},
-];
-
-export const hostRoutes = [
-    {path: hostPaths.home, element: <ReactPage />},
-    {path: hostPaths.news, element: <ReactPage />},
-    {path: hostPaths.post, element: <ReactPage />},
-    {path: hostPaths.blog, element: <ReactPage />},
-    {path: hostPaths.search, element: <ReactPage />},
-    {path: hostPaths.docs, element: <ReactPage />},
-];
-
-export const embeddedRoutes = [
-    {path: embeddedPaths.home, component: VuePage},
-    {path: embeddedPaths.news, component: VuePage},
-    {path: embeddedPaths.post, component: VuePage},
-    {path: embeddedPaths.blog, component: VuePage},
-    {path: embeddedPaths.search, component: VuePage},
-    {path: embeddedPaths.docs, component: VuePage},
-];
+export const createRoutes = (mode: BrowserMode) =>
+    createRoutesFromElements(
+        <Route element={<Layout mode={mode} />}>
+            <Route path="/portal/home" element={<Content mode={mode} />} />
+            <Route path="/portal/discussion/:discussion_id" element={<Content mode={mode} />} />
+            <Route path="/portal/user/:user_id" element={<Content mode={mode} />} />
+            <Route path="/portal/articles" element={<Content mode={mode} />} />
+            <Route path="/portal/friend" element={<Content mode={mode} />} />
+            <Route path="/portal/error/not_found" element={<Content mode={mode} />} />
+            <Route path="*" element={<Content mode={mode} />} />
+        </Route>,
+    );
